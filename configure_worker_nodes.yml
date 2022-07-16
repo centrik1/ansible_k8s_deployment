@@ -1,0 +1,23 @@
+---
+- hosts: worker
+  vars_files:
+  - env_variables
+  tasks:
+    - name: Copying token to worker nodes
+      copy: src={{ token_file }} dest=join_token
+
+    - name: Joining worker nodes with kubernetes master
+      shell: "$(cat join_token)"
+      become: yes
+
+    - name: Creates .kube directory
+      file:
+        path: ~/.kube
+        state: directory
+
+    - name: Transer admin.conf file from master to worker
+      copy:
+        src: config
+        dest: ~/.kube/config
+
+
